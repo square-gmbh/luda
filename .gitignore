@@ -1,3 +1,4 @@
 *.swp
 *~
 apps
+.DS_Store
