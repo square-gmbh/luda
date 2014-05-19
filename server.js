@@ -19,9 +19,9 @@ http.createServer(function (req, res) {
 
             if (config.routes[uri]) {
                 var page = config.routes[uri];
-                filename = '../' + config.pages[page].html;
+                filename = config.pages[page].html;
             } else {
-                filename = '../' + config.pages['not_found'].html;
+                filename = config.pages['not_found'].html;
             }
 
             fs.readFile(filename, "binary", function(err, file) {
@@ -38,7 +38,7 @@ http.createServer(function (req, res) {
             });
         // handle rest
         } else {
-            filename = '../public/' + uri;
+            filename = 'public/' + uri;
 
             fs.readFile(filename, "binary", function(err, file) {
                 if(err) {        
@@ -62,7 +62,4 @@ http.createServer(function (req, res) {
         comm.handleReq(req, module, operation, res);
     }
 
-}).listen(7777);
-
-
-
+}).listen(9016);
