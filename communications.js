@@ -39,7 +39,7 @@ exports.handleReq = function (req, module, operation, res) {
 }
 
 function processPost (req, callback) {
-    var queryData;
+    var queryData = '';
 
     req.on('data', function(data) {
         queryData += data;
