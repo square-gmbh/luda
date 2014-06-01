@@ -1,4 +1,3 @@
-var qs = require('querystring');
 var cached_modules = {};
 var link = {};
 
@@ -13,6 +12,16 @@ exports.handleReq = function (req, module, operation, res) {
     link = {
         method: req.method,
         headers: req.headers,
+        setSession: function (data) {
+
+            for (key in data) {
+                req.session[key] = data[key]
+            }
+        },
+        getSession: function (callback) {
+            callback(req.session);
+        },
+        req: req,
         url: req.url,
         res: res
     }

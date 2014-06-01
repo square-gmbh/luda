@@ -12,6 +12,12 @@ app.configure(function () {
     app.use(express.bodyParser());
     app.use(express.logger("short"));
 });
+// session init
+app.use(express.cookieParser('S3CRE7'));
+app.use(express.cookieSession({
+    key: 'app.sess',
+    secret: 'SUPERsekret'
+}));
 
 // handle get requests
 app.get("*", function (req, res) {
@@ -34,24 +40,71 @@ app.get("*", function (req, res) {
         // handle routes
         if (contentType === 'text/html') {
 
+            // check if page exists
             if (config.routes[uri]) {
                 var page = config.routes[uri];
                 filename = config.pages[page].html;
+                
+                // handle roles (if exist) (user permisions)
+                if (config.pages[page].roles) {
 
-                // send the file
-                fs.readFile(filename, "binary", function(err, file) {
+                    // get role from session
+                    var roles = config.pages[page].roles;
+                    var role = (req.session.login) ? req.session.login.role : null;
+                    if (!role) role = 'visitator';
 
-                    if (err) {        
-                        res.writeHead(500, {"Content-Type": "text/plain"});
-                        res.write(err + "\n");
-                        res.end();
-                        return;
+                    // if the user doesn't have permission or role is missing run the fail action
+                    if (roles.indexOf(role) == -1) {
+
+                        // if no roleFail action or action is reject , reject user
+                        if (!config.pages[page].roleFail || config.pages[page].roleFail[0].reject) {
+                            res.writeHead(403);
+                            res.end("You don't have permission to view this page");
+                            return;
+                        }
+
+                        // get the action
+                        var action = config.pages[page].roleFail[0];
+
+                        if (action.redirect) {
+                            var location = 'http://' + req.headers.host + action.redirect;
+                            res.writeHead(302, {"location": location});
+                            res.end();
+                            return;
+                        }
+                    } else {
+                        // user has permision so he gets the file
+                        fs.readFile(filename, "binary", function(err, file) {
+
+                            if (err) {        
+                                res.writeHead(500, {"Content-Type": "text/plain"});
+                                res.write(err + "\n");
+                                res.end();
+                                return;
+                            }
+
+                            res.writeHead(200, {"Content-Type": "text/html"});
+                            res.write(file, "binary");
+                            res.end();
+                        });
                     }
 
-                    res.writeHead(200, {"Content-Type": "text/html"});
-                    res.write(file, "binary");
-                    res.end();
-                });
+                } else {
+                    // if no roles specified for current page give it as is
+                    fs.readFile(filename, "binary", function(err, file) {
+
+                        if (err) {        
+                            res.writeHead(500, {"Content-Type": "text/plain"});
+                            res.write(err + "\n");
+                            res.end();
+                            return;
+                        }
+
+                        res.writeHead(200, {"Content-Type": "text/html"});
+                        res.write(file, "binary");
+                        res.end();
+                    });
+                }
             } else {
 
                 // check if the not found file exists
@@ -113,6 +166,8 @@ app.post("*", function (req, res) {
 
         // handle the request
         if (config.modules.indexOf(module) != -1) {
+
+            // call the operation
             comm.handleReq(req, module, operation, res);
         } else {
             res.writeHead(400);
