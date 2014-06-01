@@ -1,0 +1,10 @@
+{
+    "name": "LUDA Web Framework",
+    "version": "0.0.1",
+    "description": "Web Framework for Square apps",
+    "main": "server.js",
+    "author": "Danandrei",
+    "dependencies": {
+        "express": "3.7.0"
+    }
+}

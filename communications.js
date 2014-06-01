@@ -20,39 +20,10 @@ exports.handleReq = function (req, module, operation, res) {
     // handle POST request
     if (req.method === 'POST') {
 
-        //process POST data
-        processPost(req, function (err, data) {
+        // build link
+        link.data = req.body;
 
-            if (err) {
-                res.writeHead(413, {'Content-Type': 'text/plain'}).end();
-                req.connection.destroy();
-                return;
-            }
-
-            // build link
-            link.data = data;
-
-            //call opperation
-            cached_modules[module][operation](link);
-        });
+        //call opperation
+        cached_modules[module][operation](link);
     }
-}
-
-function processPost (req, callback) {
-    var queryData = '';
-
-    req.on('data', function(data) {
-        queryData += data;
-
-        // kill request if too large
-        if (queryData.length > 1e6) {
-            queryData = '';
-            return callback(new Error('Request data too large!'));
-        }
-    });
-
-    req.on('end', function() {
-        var body = qs.parse(queryData)
-        callback(null, body);
-    });
 }
