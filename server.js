@@ -5,12 +5,14 @@ var app = express();
 var url = require('url');
 var config = require('../app.json');
 var comm = require('./communications.js');
+var port;
 
 // configure app
 app.configure(function () {
     app.use(express.static(path.join(__dirname, 'public')));
     app.use(express.bodyParser());
     app.use(express.logger("short"));
+    port = process.argv[2] || config.port;
 });
 // session init
 app.use(express.cookieParser('S3CRE7'));
@@ -180,4 +182,4 @@ app.post("*", function (req, res) {
     }
 });
 
-app.listen(9016);
+app.listen(port);
