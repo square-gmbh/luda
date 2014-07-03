@@ -3,9 +3,17 @@ var fs = require('fs');
 var express = require('express');
 var app = express();
 var url = require('url');
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 var config = require('../app.json');
 var comm = require('./communications.js');
 var port;
+
+// handle custom code
+if (config.socket) {
+    var socket = require('../' + config.socket);
+    socket(fs, io);
+}
 
 // configure app
 app.configure(function () {
@@ -138,9 +146,9 @@ app.get("*", function (req, res) {
         // handle rest
         } else {
             filename = 'public/' + uri;
-
+            
             fs.readFile(filename, "binary", function(err, file) {
-                if (err) {        
+                if (err) {
                     res.writeHead(500, {"Content-Type": "text/plain"});
                     res.write(err + "\n");
                     res.end();
@@ -182,4 +190,4 @@ app.post("*", function (req, res) {
     }
 });
 
-app.listen(port);
+http.listen(port);
