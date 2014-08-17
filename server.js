@@ -142,7 +142,22 @@ app.get("*", function (req, res) {
                     res.end();
                 });
             }
+        // handle scripts
+        } else if (contentType === "*/*") {
+            filename = 'public/' + uri;
+            
+            fs.readFile(filename, "binary", function(err, file) {
+                if (err) {
+                    res.writeHead(500, {"Content-Type": "text/plain"});
+                    res.write(err + "\n");
+                    res.end();
+                    return;
+                }
 
+                res.writeHead(200, {"Content-Type": "application/javascript"});
+                res.write(file, "binary");
+                res.end();
+            });
         // handle rest
         } else {
             filename = 'public/' + uri;
