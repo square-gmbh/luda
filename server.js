@@ -51,6 +51,9 @@ app.get("*", function (req, res) {
         if (contentType === 'text/html') {
 
             // check if page exists
+            uri = uri.match(/^\/.*?\/|^\/.*$/);
+            uri = uri[0].replace(/\/$/, "");
+            uri = uri || "/";
             if (config.routes[uri]) {
                 var page = config.routes[uri];
                 filename = config.pages[page].html;
