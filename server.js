@@ -57,18 +57,9 @@ app.post("*", function (req, res) {
 
     if (uri.substring(0, 3) === '/@/') {
 
-        var module = uri.split('/')[2];
-        var operation = uri.split('/')[3];
+        // forward request
+        comm.handleReq(config.modules, uri, req, res);
 
-        // handle the request
-        if (config.modules.indexOf(module) != -1) {
-
-            // call the operation
-            comm.handleReq(req, module, operation, res);
-        } else {
-            res.writeHead(400);
-            res.end('module does not exist or not declared in the application descriptor file');
-        }
     } else {
         // this application does not support this kind of request please make a module POSt req
         res.writeHead(400);
