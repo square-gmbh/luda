@@ -41,8 +41,10 @@ app.get("*", function (req, res) {
         // module request
         // TODO implement this
 
-        res.writeHead(500);
-        res.end('Not yet implemented');
+        comm.handleReq(config.modules, uri, req, res);
+
+        //res.writeHead(500);
+        //res.end('Not yet implemented');
     } else {
         // handle routes
         router.handleRoute(req, res);
