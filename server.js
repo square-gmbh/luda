@@ -38,13 +38,9 @@ app.get("*", function (req, res) {
 
     // check if request is module or not
     if (uri.substring(0, 3) === '/@/') {
-        // module request
-        // TODO implement this
-
+        
+        // forward request
         comm.handleReq(config.modules, uri, req, res);
-
-        //res.writeHead(500);
-        //res.end('Not yet implemented');
     } else {
         // handle routes
         router.handleRoute(req, res);
