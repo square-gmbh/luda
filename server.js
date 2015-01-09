@@ -4,16 +4,27 @@ var express = require('express');
 var app = express();
 var url = require('url');
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
 var config = require(path.join(__dirname, '../app.json'));
 var comm = require('./lib/communications.js');
 var router = require('./lib/router.js');
 var port;
 
+// handle init code
+if (config.init) {
+    var init = require('../' + config.init)();
+}
+
 // handle custom code
 if (config.socket) {
-    var socket = require('../' + config.socket);
-    socket(fs, io);
+    if (init) {
+        init.on('done', function (data) {
+            var io = require('socket.io')(http);
+            require('../' + config.socket)(fs, io, data);
+        });
+    } else {
+        var io = require('socket.io')(http);
+        require('../' + config.socket)(fs, io);
+    }
 }
 
 // configure app
